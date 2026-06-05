@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: user-management-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/USER_MANAGER
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: 3
+      connection-timeout: 10000
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+  spring:
+    jpa:
+      hibernate:
+        ddl-auto: validate
