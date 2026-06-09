@@ -20,7 +20,7 @@ import java.util.Collection;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "Role")
 @EntityListeners(AuditingEntityListener.class)
-@TableGenerator(name = "RoleGen", table = "JPA_SEQUENCES", pkColumnName = "SEQ_KEY", valueColumnName = "SEQ_VALUE", pkColumnValue = "RoleId", allocationSize = 1)
+
 public class Role {
 
     @Id
