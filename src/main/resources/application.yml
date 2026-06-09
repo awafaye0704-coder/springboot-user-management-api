@@ -14,7 +14,13 @@ spring:
 
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
-  spring:
-    jpa:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
       hibernate:
-        ddl-auto: validate
+        format_sql: true

@@ -11,4 +11,5 @@
     <include file="db/changelog/db.changelog-role-permission.xml"/>
 
     <include file="db/changelog/db.changelog-user.xml"/>
+    <include file="classpath:/db/changelog/create-jpa-sequences.xml"/>
 </databaseChangeLog>

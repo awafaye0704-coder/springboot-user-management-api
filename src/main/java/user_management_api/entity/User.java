@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Table(name = "Users")
 @EntityListeners(AuditingEntityListener.class)
-@TableGenerator(name = "UserGen", table = "JPA_SEQUENCES", pkColumnName = "SEQ_KEY", valueColumnName = "SEQ_VALUE", pkColumnValue = "UserId", initialValue = 0, allocationSize = 1)
+
 public class User implements Serializable {
 
     @Id
