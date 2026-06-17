@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import io.swagger.v3.oas.annotations.media.Schema;
+import sn.techqueen.digital.keycloak.models.UserEntityModel;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "Users")
 @EntityListeners(AuditingEntityListener.class)
 
-public class User implements Serializable {
+public class User extends UserEntityModel implements  Serializable {
 
     @Id
     @Column(name = "UserId", unique = true, nullable = false)

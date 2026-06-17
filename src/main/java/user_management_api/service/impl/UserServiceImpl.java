@@ -4,13 +4,20 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sn.techqueen.digital.keycloak.exceptions.ResourceNotFoundException;
+import sn.techqueen.digital.keycloak.services.KeycloakUserService;
+import user_management_api.dto.RoleDto;
 import user_management_api.dto.UserDto;
 import user_management_api.entity.User;
+import user_management_api.mapper.RoleMapper;
 import user_management_api.mapper.UserMapper;
+import user_management_api.properties.RealmProperties;
+import user_management_api.repository.RoleRepository;
 import user_management_api.repository.UserRepository;
 import user_management_api.service.UserService;
 
@@ -21,21 +28,33 @@ import java.util.List;
 @Transactional
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    final KeycloakUserService<User, UserDto> keycloakUserService;
+    final RoleMapper roleMapper;
+    final RoleRepository roleRepository;
+
+    static final String ROLE_NOT_FOUND_MESSAGE = "Role not found with the id: {0}";
+    static final String ROLE_NOT_FOUND_BY_NAME_MESSAGE = "Role not found with the name: {0}";
+    final RealmProperties realmProperties;
 
     @Override
     public UserDto createUser(UserDto userDto) {
+        log.info("Creating user with details: {}", userDto);
+        /* Getting role by id or name*/
+        var role = getRole(userDto.getRole());
 
-        User user = userMapper.toEntity(userDto);
+        /* Enable by default */
+        userDto.setEnable(true);
 
-        user.setEnable(true);
+        /* Setting role */
+        userDto.setRole(role);
 
-        User savedUser = userRepository.save(user);
+        return keycloakUserService.createUser(realmProperties.realm(), realmProperties.clientId(), userDto);
 
-        return userMapper.toDto(savedUser);
     }
 
     @Override
@@ -73,20 +92,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto userDto) {
+        log.info("Updating user details: {}", userDto);
 
-        User user = userRepository.findByUsername(userDto.getUsername())
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        /* Setting role */
+        userDto.setRole(getRole(userDto.getRole()));
 
-        user.setUserFirstName(userDto.getUserFirstName());
-        user.setUserLastName(userDto.getUserLastName());
-        user.setUserEmailAddress(userDto.getUserEmailAddress());
-        user.setUserLocale(userDto.getUserLocale());
-        user.setRole(userMapper.toEntity(userDto).getRole());
+        /* Checking if ID exists */
+        var userDb = readUserByUserId(userDto.getUserId());
+        userDto.setUserKeycloakId(userDb.getUserKeycloakId());
+        userDto.setUsername(userDb.getUsername());
 
-        User updatedUser = userRepository.save(user);
-
-        return userMapper.toDto(updatedUser);
+        return keycloakUserService.updateUser(userDto);
     }
 
     @Override
@@ -106,5 +122,13 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    private RoleDto getRole(RoleDto userRole) {
+        if (userRole.getRoleId() != null) {
+            return roleMapper.asRole(roleRepository.findById(userRole.getRoleId()).orElseThrow(() -> new ResourceNotFoundException(ROLE_NOT_FOUND_MESSAGE, userRole.getRoleId())));
+        } else {
+            return roleMapper.asRole(roleRepository.findByName(userRole.getName()).orElseThrow(() -> new ResourceNotFoundException(ROLE_NOT_FOUND_BY_NAME_MESSAGE, userRole.getName())));
+        }
     }
 }
