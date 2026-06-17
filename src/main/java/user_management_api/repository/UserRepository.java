@@ -44,4 +44,12 @@ public interface UserRepository extends JpaRepository<User, Long>, QuerydslPredi
 
         return findAll(builder, pageable);
     }
+
+    boolean existsByUsername(String username);
+
+    boolean existsByUserEmailAddress(String userEmailAddress);
+
+    Optional<User> findByUserEmailAddress(String userEmailAddress);
+
+
 }

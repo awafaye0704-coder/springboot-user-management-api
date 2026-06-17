@@ -7,7 +7,6 @@ spring:
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
-
     hikari:
       maximum-pool-size: 3
       connection-timeout: 10000
@@ -18,9 +17,59 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
     show-sql: true
-
     properties:
       hibernate:
         format_sql: true
+
+keycloakadminclient:
+  server-url: ${KEYCLOAK_URL:http://localhost:8081}
+
+  # ✅ Correspond exactement au record KeycloakProperties
+  master:
+    realm: master
+    client-id: admin-cli
+    user: admin
+    password: admin
+
+  admin:
+    realm: user-management   # @NotEmpty — obligatoire
+    client-id: admin-cli
+    user: admin
+    password: admin
+
+  http:
+    poolsize: 5
+    sockettimeout: 5000
+    establishConnectionTimeout: 5000
+    connectionCheckoutTimeout: 5000
+    proxy:
+      enable: false
+      host: proxy
+      port: 2828
+
+account:
+  creation:
+    emailActionsList: VERIFY_EMAIL,UPDATE_PASSWORD
+    sendemail: false
+
+keycloak:
+  users:
+    active: true
+
+realm:
+  admin:
+    realm: user-management
+    client-id: admin-cli
+
+swagger:
+  ui:
+    oauth:
+      client-id: swagger-ui
+      client-secret: DVMxHc4UykoemPv7IhkujmDtMNzcKiU9
+      realms:
+        - name: user-management
+          token-url: ${KEYCLOAK_URL:http://localhost:8081}/realms/user-management/protocol/openid-connect/token
+info:
+  description: '@project.description@'
+  version: '@project.version@'

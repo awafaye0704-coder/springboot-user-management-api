@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+import sn.techqueen.digital.keycloak.models.UserDtoModel;
 
 
 import java.time.LocalDateTime;
@@ -14,10 +16,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class UserDto {
+public class UserDto extends UserDtoModel {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long userId;
